@@ -6,4 +6,4 @@ cleaned_src/
 *.xls*
 
 .env
-.txt
+projectdetails.txt
