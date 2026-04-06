@@ -1,0 +1,9 @@
+# Ignore generated and external data folders
+src/
+cleaned_src/
+
+# Ignore all Excel workbook files
+*.xls*
+
+.env
+.txt
