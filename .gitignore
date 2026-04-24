@@ -1,9 +1,19 @@
-# Ignore generated and external data folders
-src/
-cleaned_src/
-
-# Ignore all Excel workbook files
-*.xls*
-
-.env
+# SENTINEL - sensitive data
+sentinel/input/
+sentinel/output/
+sentinel/accounts/
+sentinel/config/training_labellers.txt
 projectdetails.txt
+
+# Environment files
+.env
+*.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Excel and CSV files
+*.xlsx
+*.csv

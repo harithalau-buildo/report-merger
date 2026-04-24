@@ -1,0 +1,64 @@
+{
+  "projects": [
+    {
+      "project_name": "AP_SYD_ADSO_Search_GEC_Labelling_Intention_en-SEA",
+      "fte_requested": 2,
+      "billing_rate": null,
+      "targets": {
+        "accuracy_percent": 95,
+        "productivity_per_labeller_per_day": 700,
+        "ur_percent": 76
+      }
+    },
+    {
+      "project_name": "AP_SYD_ADSO_Search_GEC_Labelling_Intention_en-US",
+      "fte_requested": 1,
+      "billing_rate": null,
+      "targets": {
+        "accuracy_percent": 95,
+        "productivity_per_labeller_per_day": 700,
+        "ur_percent": 76
+      }
+    },
+    {
+      "project_name": "AP_SYD_ADSO_Search_GEC_Labelling_Guide Search_Image Production_en-US",
+      "fte_requested": 4,
+      "billing_rate": null,
+      "targets": {
+        "accuracy_percent": 95,
+        "productivity_per_labeller_per_day": 1440,
+        "ur_percent": 76
+      }
+    },
+    {
+      "project_name": "AP_SYD_ADSO_Search_GEC_Recommendation_Product Style_GCP_en-CNS",
+      "fte_requested": 1,
+      "billing_rate": null,
+      "targets": {
+        "accuracy_percent": 95,
+        "productivity_per_labeller_per_day": 1200,
+        "ur_percent": 76
+      }
+    },
+    {
+      "project_name": "AP_SYD_ADSO_Search_GEC_Recommendations_OK-content(Live)_en-CNS",
+      "fte_requested": 5,
+      "billing_rate": null,
+      "targets": {
+        "accuracy_percent": 95,
+        "productivity_per_labeller_per_day": 700,
+        "ur_percent": 76
+      }
+    },
+    {
+      "project_name": "AP_SYD_ADSO_Search_GEC_Recommendations_OK-content(Short Video)_en-CNS",
+      "fte_requested": 3,
+      "billing_rate": null,
+      "targets": {
+        "accuracy_percent": 95,
+        "productivity_per_labeller_per_day": 135,
+        "ur_percent": 76
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+# Reporting Period (MM-DD-YYYY)
+start_date = 04-01-2026
+end_date = auto
+
+# end_date = auto uses today's date automatically.
+# Only override with a specific date when needed.
+
+# Public Holidays (MM-DD-YYYY, comma separated)
+public_holidays = 04-02-2026, 04-03-2026, 04-09-2026
+
+# Folder Settings
+input_folder = input
+accounts_folder = accounts
+output_folder = output
+
+# Global Default Thresholds (overridden per project in projects_config.json)
+accuracy_threshold = 95
+ur_threshold = 76
