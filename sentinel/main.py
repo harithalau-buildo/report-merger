@@ -8,10 +8,16 @@ import sys
 import pandas as pd
 
 from modules.account_filter import filter_dataframe_by_accounts, load_account_list
+from modules.accuracy_analyzer import analyze_accuracy
+from modules.billing_forecaster import forecast_billing
 from modules.combiner import combine_dataframes
 from modules.config_reader import DATE_FORMAT, LoadedConfig, load_configs
 from modules.date_filter import filter_dataframe_by_date, read_dataset_file
 from modules.file_identifier import IdentifiedFile, identify_input_files
+from modules.fte_calculator import calculate_fte
+from modules.productivity_tracker import track_productivity
+from modules.report_generator import generate_report
+from modules.ur_analyzer import analyze_ur
 
 
 def ensure_output_folder(output_folder: Path) -> None:
@@ -55,6 +61,16 @@ def calculate_working_days(loaded_config: LoadedConfig) -> tuple[int, int]:
         f"period={run_config.start_date.strftime(DATE_FORMAT)} to {run_config.end_date.strftime(DATE_FORMAT)}"
     )
     return elapsed, remaining
+
+
+def calculate_total_working_days_month(loaded_config: LoadedConfig) -> int:
+    run_config = loaded_config.run_config
+    first_day = date(run_config.end_date.year, run_config.end_date.month, 1)
+    last_day = monthrange(run_config.end_date.year, run_config.end_date.month)[1]
+    last_day_of_month = date(run_config.end_date.year, run_config.end_date.month, last_day)
+    total = count_business_days(first_day, last_day_of_month, run_config.public_holidays)
+    print(f"[DATES] Total working days in month = {total}")
+    return total
 
 
 def _read_dataframe(file_info: IdentifiedFile) -> pd.DataFrame:
@@ -117,6 +133,13 @@ def flag_training_labellers(master_df: pd.DataFrame, loaded_config: LoadedConfig
     return working
 
 
+def _print_module_summary(label: str, dataframe: pd.DataFrame) -> None:
+    print(f"[SUMMARY] {label}: {len(dataframe)} rows")
+    if dataframe.empty:
+        return
+    print(dataframe.to_string(index=False))
+
+
 def main() -> None:
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")
@@ -125,12 +148,13 @@ def main() -> None:
         pass
 
     base_dir = Path(__file__).resolve().parent
-    print("[MAIN] SENTINEL v2.0 Week 1 pipeline starting")
+    print("[MAIN] SENTINEL v2.0 Week 2 pipeline starting")
 
     try:
         loaded_config = load_configs(base_dir)
         ensure_output_folder(loaded_config.run_config.output_folder)
-        calculate_working_days(loaded_config)
+        working_days_elapsed, working_days_remaining = calculate_working_days(loaded_config)
+        total_working_days_month = calculate_total_working_days_month(loaded_config)
 
         identified_files = identify_input_files(loaded_config.run_config.input_folder)
         print("[FILES] Files identified successfully")
@@ -167,6 +191,44 @@ def main() -> None:
         print("[SUMMARY] Files identified")
         print(f"[SUMMARY] Master dataframe shape = {master_df.shape}")
         print(f"[SUMMARY] Training labellers flagged count = {int(master_df['non_billable'].sum())}")
+
+        fte_df = calculate_fte(master_df, loaded_config, working_days_elapsed)
+        accuracy_df = analyze_accuracy(master_df, loaded_config)
+        productivity_df = track_productivity(
+            master_df,
+            loaded_config,
+            working_days_elapsed=working_days_elapsed,
+            working_days_remaining=working_days_remaining,
+            total_working_days_month=total_working_days_month,
+        )
+        ur_df = analyze_ur(master_df, loaded_config)
+        billing_df = forecast_billing(
+            fte_df,
+            loaded_config,
+            total_working_days_month=total_working_days_month,
+            working_days_elapsed=working_days_elapsed,
+        )
+
+        _print_module_summary("FTE Analysis", fte_df)
+        _print_module_summary("Accuracy", accuracy_df)
+        _print_module_summary("Productivity", productivity_df)
+        _print_module_summary("UR Analysis", ur_df)
+        _print_module_summary("Billing Forecast", billing_df)
+
+        output_path = generate_report(
+            fte_df=fte_df,
+            accuracy_df=accuracy_df,
+            productivity_df=productivity_df,
+            ur_df=ur_df,
+            billing_df=billing_df,
+            master_df=master_df,
+            onduty_filtered=account_filtered_frames["onduty"],
+            productivity_filtered=account_filtered_frames["productivity"],
+            ur_filtered=account_filtered_frames["ur"],
+            accuracy_filtered=account_filtered_frames["accuracy"],
+            loaded_config=loaded_config,
+        )
+        print(f"[OUTPUT] Report saved to: {output_path}")
 
     except FileNotFoundError as exc:
         print(f"[ERROR] {exc}")
